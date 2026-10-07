@@ -9,3 +9,5 @@
 .open-panel input,.open-panel button {max-width:100%;padding:12px;border-radius:8px;background:#173956;color:#fff;border:1px solid #749aba;font:inherit;}
 .archive-warning {border-color:#e8b955;color:#ffe5ad;line-height:1.6;}
 @media(max-width:600px){.open-panel,.archive-warning{margin:12px;padding:16px;}}
+
+#dashboard-password{display:block;max-width:100%;width:24rem;padding:.65rem;margin:.5rem 0}#login-controls label{display:block;margin:.5rem 0}#open-panel button{margin:.3rem .6rem .3rem 0}
