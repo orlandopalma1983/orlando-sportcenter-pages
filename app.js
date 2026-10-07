@@ -62,7 +62,7 @@ document.querySelector('#doctor-investment').innerHTML=`<strong>Inversión inici
 document.querySelector('#doctor-summary').innerHTML=[
  ['Cupones',doctorRecord(totalDoctor),`${totalDoctor.cupones} ratificados por Orlando`],
  ['Selecciones',doctorSelectionRecord(totalDoctor),`${totalDoctor.selecciones} selecciones contabilizadas`],
- ['Dinero apostado',money(totalDoctor.apostado_centavos),'solo cupones del Doctor'],
+ ['Dinero apostado',money(totalDoctor.apostado_centavos),totalDoctor.apuesta_gratis_centavos?`dinero propio · ${money(totalDoctor.apuesta_gratis_centavos)} en apuestas gratis aparte`:'solo cupones del Doctor'],
  ['Dinero cobrado',money(totalDoctor.cobrado_centavos),'cobros liquidados'],
  ['Neto de apuestas',signedMoney(totalDoctor.resultado_apuestas_centavos),'cobrado menos apostado'],
  ['Neto total',signedMoney(totalDoctor.resultado_total_centavos),'incluye la inversión inicial']
