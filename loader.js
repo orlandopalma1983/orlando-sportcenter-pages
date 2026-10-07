@@ -33,14 +33,14 @@ input.addEventListener('change', async () => {
     const data = JSON.parse(await file.text());
     validate(data);
     window.renderSportCenter(escapePayload(data));
-    warning.textContent = 'ARCHIVO HISTÓRICO · Generado: '+data.meta.generado_label+'. No es información actual. Cada sección conserva su propio corte. El snapshot reconstruido del 06-10-2026 tiene conciliación Betano pendiente y cifras cuestionadas; no usarlo para decidir apuestas, pagos ni waivers.';
+    warning.textContent = (data.meta.snapshot_tipo==='CORTE_VERIFICADO'?'CORTE VERIFICADO · ':'ARCHIVO HISTÓRICO · ')+data.meta.generado_label+'. '+(data.meta.nota_datos||'Cada sección conserva su propio corte. No es una actualización automática; conciliación Betano pendiente.');
     warning.hidden = false;
     document.querySelector('main').hidden = false;
     document.querySelector('nav.tabs').hidden = false;
     clear.hidden = false;
     input.disabled = true;
     status.textContent='Archivo abierto localmente. Para abrir otro, cierra este primero.';
-    document.querySelector('#data-cut').textContent='Archivo histórico · '+data.meta.generado_label;
+    document.querySelector('#data-cut').textContent='Archivo · '+data.meta.generado_label;
     // Remove the legacy live signal: opening a snapshot does not refresh it.
     document.querySelector('.live-dot').hidden = true;
   } catch (error) {
