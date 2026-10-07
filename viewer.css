@@ -1,0 +1,11 @@
+[hidden] { display: none !important; }
+.standings-grid > *, .summary-grid > *, .finance-accounts > * {min-width:0;}
+.tabs {justify-content:flex-start;overflow-x:auto;}
+.tabs a {flex-shrink:0;}
+.open-panel,.archive-warning {overflow-wrap:anywhere;}
+.open-panel,.archive-warning {max-width: 1440px; margin: 20px auto; padding: 24px; border: 1px solid #315578; border-radius: 16px; background: #102338; color:#eef5ff;}
+.open-panel p {max-width:80ch;line-height:1.6;}
+.open-panel label {display:block;font-weight:700;margin:16px 0 8px;}
+.open-panel input,.open-panel button {max-width:100%;padding:12px;border-radius:8px;background:#173956;color:#fff;border:1px solid #749aba;font:inherit;}
+.archive-warning {border-color:#e8b955;color:#ffe5ad;line-height:1.6;}
+@media(max-width:600px){.open-panel,.archive-warning{margin:12px;padding:16px;}}
