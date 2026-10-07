@@ -18,8 +18,9 @@ document.querySelector('#data-cut').textContent=decodeText(`Corte: ${D.meta.cort
 document.querySelector('#generated-at').textContent=decodeText(`Generado: ${D.meta.generado_label}`);
 
 const saldoBetanoValido=D.resumen.saldo_betano_disponible_centavos>=0;
+const saldoBetanoConfirmado=D.resumen.saldo_betano_validacion==='CONFIRMADO_POR_ORLANDO'&&D.resumen.saldo_betano_confirmado_usuario_centavos===D.resumen.saldo_betano_disponible_centavos;
 const metrics=[
- [D.resumen.saldo_betano_estado?'Saldo Betano calculado':'Saldo disponible Betano',saldoBetanoValido?money(D.resumen.saldo_betano_disponible_centavos):'Pendiente de confirmar',saldoBetanoValido?(D.resumen.saldo_betano_estado?'Pendiente de confirmación en Betano':'saldo base + depósitos − retiros − apuestas + cobros'):'los cupones nuevos prueban fondos posteriores no registrados'],
+ [saldoBetanoConfirmado?'Saldo disponible Betano':D.resumen.saldo_betano_estado?'Saldo Betano calculado':'Saldo disponible Betano',saldoBetanoValido?money(D.resumen.saldo_betano_disponible_centavos):'Pendiente de confirmar',saldoBetanoValido?(saldoBetanoConfirmado?'Confirmado por Orlando':D.resumen.saldo_betano_estado?'Pendiente de confirmación en Betano':'saldo base + depósitos − retiros − apuestas + cobros'):'los cupones nuevos prueban fondos posteriores no registrados'],
  ['Apuesta activa',money(D.resumen.apuesta_activa_centavos),`${D.resumen.cupones_activos} cupones activos${D.cupones.some(c=>c.apuesta_gratis_centavos)?` · ${money(D.cupones.reduce((n,c)=>n+(c.apuesta_gratis_centavos||0),0))} en apuestas gratis aparte`:""}`],
  ['Cobro potencial total',money(D.resumen.cobro_potencial_centavos),'si aciertan los cupones vigentes'],
  ['Ganancia neta potencial',money(D.resumen.ganancia_neta_centavos),'sobre el capital activo']];
@@ -28,7 +29,8 @@ document.querySelector('#resumen .notice').innerHTML=saldoBetanoValido
  ?`<strong>Cálculo Betano:</strong> ${money(D.resumen.saldo_betano_base_centavos)} de saldo base + ${money(D.resumen.saldo_betano_depositos_centavos)} depositados − ${money(D.resumen.saldo_betano_retiros_centavos||0)} retirados − ${money(D.resumen.saldo_betano_debitos_centavos)} apostados + ${money(D.resumen.saldo_betano_abonos_centavos)} de cupones ganados confirmados ${D.resumen.saldo_betano_ajustes_centavos>=0?'+':'−'} ${money(Math.abs(D.resumen.saldo_betano_ajustes_centavos||0))} de ajustes confirmados = <strong>${money(D.resumen.saldo_betano_disponible_centavos)} disponibles</strong>.`
  :`<strong>Saldo Betano pendiente:</strong> los cupones nuevos suman apuestas posteriores al último saldo confirmado. No se muestra un saldo negativo ficticio; falta registrar el depósito o saldo más reciente.`;
 
-if(D.resumen.saldo_betano_estado) document.querySelector('#resumen .notice').textContent=D.resumen.saldo_betano_estado+' · Los totales activos incluyen cupones pendientes de conciliación.';
+if(saldoBetanoConfirmado) document.querySelector('#resumen .notice').textContent=D.resumen.saldo_betano_estado;
+else if(D.resumen.saldo_betano_estado) document.querySelector('#resumen .notice').textContent=D.resumen.saldo_betano_estado+' · Los totales activos incluyen cupones pendientes de conciliación.';
 
 const H=D.hipica;
 document.querySelector('#hipica-count').textContent=decodeText(`${H.carreras.length} carreras · ${H.modelo==='EFICIENCIA_50_50'?'Modelo 50/50':`${H.medios} medios`}`);
