@@ -17,6 +17,22 @@ const cutLabel=c=>c?`<span class="leg-cut ${cutClass(c.estado_provisional)}"><b>
 document.querySelector('#data-cut').textContent=decodeText(`Corte: ${D.meta.corte_label}`);
 document.querySelector('#generated-at').textContent=decodeText(`Generado: ${D.meta.generado_label}`);
 
+const PF=D.polla_futbol||{partidos:[],puntos_total:0,revisados:0,pendientes:0};
+document.querySelector('#polla-futbol-count').textContent=decodeText(`${PF.partidos.length} partidos`);
+document.querySelector('#polla-futbol-summary').innerHTML=[
+ ['Puntos acumulados',PF.puntos_total,'Solo partidos revisados'],
+ ['Revisados',PF.revisados,'Con resultado confirmado'],
+ ['Pendientes',PF.pendientes,'Sin resultado ni puntos asignados']
+].map(([label,value,note])=>`<article class="metric"><div class="label">${label}</div><div class="value">${value}</div><div class="sub">${note}</div></article>`).join('');
+let pollaDate=null;
+document.querySelector('#polla-futbol-timeline').innerHTML=PF.partidos.length?PF.partidos.map(match=>{
+ const reviewed=match.estado==='REVISADO';
+ const day=match.fecha.split('-').reverse().join('-');
+ const heading=pollaDate===match.fecha?'':`<h3 class="polla-day">${day}</h3>`;
+ pollaDate=match.fecha;
+ return heading+`<article class="timeline-card polla-match"><div class="polla-game"><div><div class="timeline-order">${match.hora?esc(match.hora)+' · Chile':'Hora por confirmar'}${match.competicion?' · '+esc(match.competicion):''}</div><h3>⚽ ${esc(match.local)} vs. ${esc(match.visitante)}</h3></div><div><div class="game-meta">Tu pronóstico</div><strong class="polla-prediction">${match.pronostico_local} – ${match.pronostico_visitante}</strong></div></div>${reviewed?`<div class="polla-results"><div><span>Resultado final</span><strong>${match.resultado_local} – ${match.resultado_visitante}</strong></div><div><span>Puntos</span><strong class="polla-points">${match.puntos} pts</strong></div><div><span>Revisado</span><strong>${esc(match.motivo)}</strong></div></div>`:'<p class="polla-pending">🟡 Pendiente · sin revisar</p>'}</article>`;
+}).join(''):'<div class="notice">Pendiente de cargar tus pronósticos del viernes 9 al miércoles 14.</div>';
+
 const saldoBetanoValido=D.resumen.saldo_betano_disponible_centavos>=0;
 const saldoBetanoConfirmado=D.resumen.saldo_betano_validacion==='CONFIRMADO_POR_ORLANDO'&&D.resumen.saldo_betano_confirmado_usuario_centavos===D.resumen.saldo_betano_disponible_centavos;
 const metrics=[
