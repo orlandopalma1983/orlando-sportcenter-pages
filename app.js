@@ -20,7 +20,7 @@ document.querySelector('#generated-at').textContent=decodeText(`Generado: ${D.me
 const PF=D.polla_futbol||{partidos:[],puntos_total:0,revisados:0,pendientes:0};
 document.querySelector('#polla-futbol-count').textContent=decodeText(`${PF.partidos.length} partidos`);
 document.querySelector('#polla-futbol-summary').innerHTML=[
- ['Puntos acumulados',PF.puntos_total,'Solo partidos revisados'],
+ ['Puntos acumulados',`${PF.puntos_total} de ${PF.puntos_posibles??6*PF.revisados}`,'Puntos posibles · 6 por partido revisado'],
  ['Revisados',PF.revisados,'Con resultado confirmado'],
  ['Pendientes',PF.pendientes,'Sin resultado ni puntos asignados']
 ].map(([label,value,note])=>`<article class="metric"><div class="label">${label}</div><div class="value">${value}</div><div class="sub">${note}</div></article>`).join('');
