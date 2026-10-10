@@ -4,7 +4,6 @@ const password=document.querySelector('#dashboard-password');
 const remember=document.querySelector('#remember-access');
 const unlock=document.querySelector('#unlock');
 const lock=document.querySelector('#lock');
-const warning=document.querySelector('#archive-warning');
 const inputPanel=document.querySelector('#login-controls');
 const openPanel=document.querySelector('#open-panel');
 const bytes=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
@@ -55,7 +54,7 @@ async function show(key){
   const plain=await crypto.subtle.decrypt({name:'AES-GCM',iv:bytes(envelope.iv),additionalData:new TextEncoder().encode('SportCenter sealed snapshot v1'),tagLength:128},key,bytes(envelope.ciphertext));
   const data=JSON.parse(new TextDecoder().decode(plain));validate(data);
   window.renderSportCenter(escapePayload(data));
-  warning.textContent='';warning.hidden=true;document.querySelector('main').hidden=false;document.querySelector('nav.tabs').hidden=false;
+  document.querySelector('main').hidden=false;document.querySelector('nav.tabs').hidden=false;
   document.querySelector('#data-cut').textContent='Actualizado · '+data.meta.generado_label;
   document.querySelector('.live-dot').hidden=true;
   inputPanel.hidden=true;openPanel.hidden=true;lock.hidden=true;password.value='';
