@@ -34,7 +34,7 @@ document.querySelector('#polla-futbol-timeline').innerHTML=PF.partidos.length?PF
 }).join(''):'<div class="notice">Pendiente de cargar tus pronósticos del viernes 9 al miércoles 14.</div>';
 
 const saldoBetanoValido=D.resumen.saldo_betano_disponible_centavos>=0;
-const saldoBetanoConfirmado=D.resumen.saldo_betano_validacion==='CONFIRMADO_POR_ORLANDO'&&D.resumen.saldo_betano_confirmado_usuario_centavos===D.resumen.saldo_betano_disponible_centavos;
+const saldoBetanoConfirmado=['CONFIRMADO_POR_ORLANDO','BASE_REESTABLECIDA_POR_ORLANDO'].includes(D.resumen.saldo_betano_validacion)&&D.resumen.saldo_betano_confirmado_usuario_centavos===D.resumen.saldo_betano_disponible_centavos;
 const saldoBetanoInformado=D.resumen.saldo_betano_validacion==='SALDO_INFORMADO_NO_CONCILIADO'&&D.resumen.saldo_betano_libro_al_observar_centavos===D.resumen.saldo_betano_disponible_centavos;
 const metrics=[
  [saldoBetanoConfirmado||saldoBetanoInformado?'Saldo disponible Betano':D.resumen.saldo_betano_estado?'Saldo Betano calculado':'Saldo disponible Betano',saldoBetanoInformado?money(D.resumen.saldo_betano_confirmado_usuario_centavos):saldoBetanoValido?money(D.resumen.saldo_betano_disponible_centavos):'Pendiente de confirmar',saldoBetanoInformado?'Informado por Orlando · conciliación pendiente':saldoBetanoValido?(saldoBetanoConfirmado?'Confirmado por Orlando':D.resumen.saldo_betano_estado?'Pendiente de confirmación en Betano':'saldo base + depósitos − retiros − apuestas + cobros'):'los cupones nuevos prueban fondos posteriores no registrados'],

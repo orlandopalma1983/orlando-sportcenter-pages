@@ -6,6 +6,7 @@ const unlock=document.querySelector('#unlock');
 const lock=document.querySelector('#lock');
 const warning=document.querySelector('#archive-warning');
 const inputPanel=document.querySelector('#login-controls');
+const openPanel=document.querySelector('#open-panel');
 const bytes=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
 let envelope=null;
 const listKeys=['cupones','apuestas_largo_plazo','fantasy','alineaciones_propuestas','rivales_probables','waivers_propuestos','posiciones','cronologia','fantasy_cortes'];
@@ -30,7 +31,7 @@ function escapePayload(value,depth=0){
   }
   return value;
 }
-// Persist only a non-extractable CryptoKey, with explicit device consent.
+// Owner requested remembered access; persist only a non-extractable CryptoKey.
 async function savedAccess(mode,value){
   return new Promise((resolve,reject)=>{
     const request=indexedDB.open('sportcenter-access-v1',1);
@@ -54,11 +55,10 @@ async function show(key){
   const plain=await crypto.subtle.decrypt({name:'AES-GCM',iv:bytes(envelope.iv),additionalData:new TextEncoder().encode('SportCenter sealed snapshot v1'),tagLength:128},key,bytes(envelope.ciphertext));
   const data=JSON.parse(new TextDecoder().decode(plain));validate(data);
   window.renderSportCenter(escapePayload(data));
-  warning.textContent=data.meta.generado_label+'. '+(data.meta.nota_datos||'Cada sección conserva su propio corte.');
-  warning.hidden=false;document.querySelector('main').hidden=false;document.querySelector('nav.tabs').hidden=false;
+  warning.textContent='';warning.hidden=true;document.querySelector('main').hidden=false;document.querySelector('nav.tabs').hidden=false;
   document.querySelector('#data-cut').textContent='Actualizado · '+data.meta.generado_label;
   document.querySelector('.live-dot').hidden=true;
-  inputPanel.hidden=true;lock.hidden=false;password.value='';
+  inputPanel.hidden=true;openPanel.hidden=true;lock.hidden=true;password.value='';
   status.textContent='Dashboard actualizado. Las próximas publicaciones aparecerán al abrir este enlace.';
 }
 unlock.addEventListener('click',async()=>{
@@ -87,10 +87,11 @@ document.querySelector('#refresh-dashboard').addEventListener('click',()=>locati
     const text=await response.text();if(text.length>16*1024*1024)throw Error('Archivo demasiado grande');
     envelope=JSON.parse(text);
     if(envelope.version!==1||envelope.kdf!=='PBKDF2-SHA256'||envelope.iterations!==600000||bytes(envelope.salt).length!==32||bytes(envelope.iv).length!==12)throw Error('Formato no válido');
-    unlock.disabled=false;status.textContent='Escribe tu contraseña para abrir el dashboard.';
+    unlock.disabled=false;
     try{
       const saved=await savedAccess('get');
-      if(saved&&saved.salt===envelope.salt){await show(saved.key);status.textContent='Última publicación cargada automáticamente.'}
-    }catch{status.textContent='Introduce la contraseña para renovar el acceso.'}
-  }catch{status.textContent='No se pudo cargar la última publicación. Pulsa Actualizar para reintentar.'}
+      if(saved&&saved.salt===envelope.salt){await show(saved.key);return}
+    }catch{}
+    openPanel.hidden=false;inputPanel.hidden=false;status.textContent='Abre tu dashboard una vez para recordar el acceso en este navegador.';
+  }catch{openPanel.hidden=false;status.textContent='No se pudo cargar la última publicación. Pulsa Actualizar para reintentar.'}
 })();
