@@ -35,8 +35,9 @@ document.querySelector('#polla-futbol-timeline').innerHTML=PF.partidos.length?PF
 
 const saldoBetanoValido=D.resumen.saldo_betano_disponible_centavos>=0;
 const saldoBetanoConfirmado=D.resumen.saldo_betano_validacion==='CONFIRMADO_POR_ORLANDO'&&D.resumen.saldo_betano_confirmado_usuario_centavos===D.resumen.saldo_betano_disponible_centavos;
+const saldoBetanoInformado=D.resumen.saldo_betano_validacion==='SALDO_INFORMADO_NO_CONCILIADO'&&D.resumen.saldo_betano_libro_al_observar_centavos===D.resumen.saldo_betano_disponible_centavos;
 const metrics=[
- [saldoBetanoConfirmado?'Saldo disponible Betano':D.resumen.saldo_betano_estado?'Saldo Betano calculado':'Saldo disponible Betano',saldoBetanoValido?money(D.resumen.saldo_betano_disponible_centavos):'Pendiente de confirmar',saldoBetanoValido?(saldoBetanoConfirmado?'Confirmado por Orlando':D.resumen.saldo_betano_estado?'Pendiente de confirmación en Betano':'saldo base + depósitos − retiros − apuestas + cobros'):'los cupones nuevos prueban fondos posteriores no registrados'],
+ [saldoBetanoConfirmado||saldoBetanoInformado?'Saldo disponible Betano':D.resumen.saldo_betano_estado?'Saldo Betano calculado':'Saldo disponible Betano',saldoBetanoInformado?money(D.resumen.saldo_betano_confirmado_usuario_centavos):saldoBetanoValido?money(D.resumen.saldo_betano_disponible_centavos):'Pendiente de confirmar',saldoBetanoInformado?'Informado por Orlando · conciliación pendiente':saldoBetanoValido?(saldoBetanoConfirmado?'Confirmado por Orlando':D.resumen.saldo_betano_estado?'Pendiente de confirmación en Betano':'saldo base + depósitos − retiros − apuestas + cobros'):'los cupones nuevos prueban fondos posteriores no registrados'],
  ['Apuesta activa',money(D.resumen.apuesta_activa_centavos),`${D.resumen.cupones_activos} cupones activos${D.cupones.some(c=>c.apuesta_gratis_centavos)?` · ${money(D.cupones.reduce((n,c)=>n+(c.apuesta_gratis_centavos||0),0))} en apuestas gratis aparte`:""}`],
  ['Cobro potencial total',money(D.resumen.cobro_potencial_centavos),'si aciertan los cupones vigentes'],
  ['Ganancia neta potencial',money(D.resumen.ganancia_neta_centavos),'sobre el capital activo']];
