@@ -62,3 +62,5 @@ footer{max-width:1240px;margin:auto;border-top:1px solid var(--line);padding:22p
 @media(max-width:600px){.polla-game{align-items:flex-start;flex-direction:column;gap:12px}.polla-game h3{overflow-wrap:anywhere}.polla-results{gap:12px}.polla-prediction{font-size:24px}}
 
 #propuesta-semana6{min-width:0;max-width:100%;overflow-wrap:anywhere}.proposal-w6{min-width:0;max-width:100%;box-sizing:border-box;margin-block:16px;overflow-wrap:anywhere}.proposal-w6 ul{padding-left:20px}.proposal-w6 li{margin-block:8px}
+
+.polla-standings{width:100%;border-collapse:collapse}.polla-standings th,.polla-standings td{padding:.75rem;text-align:left;border-bottom:1px solid #23384b}.polla-standings th:last-child,.polla-standings td:last-child{text-align:right}.polla-orlando{background:#173c55;font-weight:700}.polla-match{min-width:0}.polla-results{flex-wrap:wrap}.timeline-block.polla-match{background:#112c36;border-color:#346858}
