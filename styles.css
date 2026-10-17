@@ -78,3 +78,6 @@ footer{max-width:1240px;margin:auto;border-top:1px solid var(--line);padding:22p
 .long-term-coupon{display:flex;flex-wrap:wrap;gap:.35rem 1rem;padding:.75rem 0;border-bottom:1px solid #344254}
 .long-term-coupon strong{flex-basis:100%}
 .long-term-note{font-size:.8rem;margin-bottom:0}
+
+/* Private race-by-race group ticket tracker. */
+.pollon-ticket{min-width:0}.pollon-summary{margin:1rem 0}.pollon-money{margin:1rem 0}.pollon-note{margin-bottom:1rem}.pollon-table-wrap{max-width:100%;overflow-x:auto}.pollon-table{width:100%;min-width:650px;border-collapse:collapse;background:var(--card,#101f32)}.pollon-table th,.pollon-table td{padding:.85rem;text-align:left;border-bottom:1px solid rgba(148,163,184,.18);vertical-align:top}.pollon-table th small{display:block;font-weight:400;margin-top:.3rem;color:#94a3b8}.pollon-defenders{margin-top:.5rem;max-width:23rem;min-width:12rem}.pollon-defenders summary{font-size:.8rem;cursor:pointer;color:#94a3b8}.pollon-defenders p{font-size:.8rem;line-height:1.6;white-space:normal}@media(max-width:640px){.pollon-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.pollon-summary .value{font-size:1.4rem}.pollon-money{grid-template-columns:1fr}.pollon-table th,.pollon-table td{padding:.65rem}}
