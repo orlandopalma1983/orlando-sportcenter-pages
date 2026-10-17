@@ -77,7 +77,7 @@ document.querySelector('#hipica-coupon-list').innerHTML=hipicaCoupons.map(c=>`<a
 
 const DS=D.estadisticas_doctor,totalDoctor=DS.total;
 const signedMoney=c=>c>0?`+${money(c)}`:c<0?`-${money(-c)}`:money(0);
-const doctorRecord=s=>`${s.cupones_ganados} ganados · ${s.cupones_perdidos} perdidos · ${s.cupones_pendientes} pendientes${s.cupones_cashout?` · ${s.cupones_cashout} cash out`:""}`;
+const doctorRecord=s=>`${s.cupones_ganados} ganados · ${s.cupones_perdidos} perdidos · ${s.cupones_pendientes} pendientes${s.cupones_cashout?` · ${s.cupones_cashout} cash out`:""}${s.cupones_anulados?` · ${s.cupones_anulados} anulados`:""}`;
 const doctorSelectionRecord=s=>`${s.selecciones_acertadas} aciertos · ${s.selecciones_perdidas} pérdidas · ${s.selecciones_pendientes} pendientes${s.selecciones_anuladas?` · ${s.selecciones_anuladas} anuladas`:""}${s.selecciones_cashout?` · ${s.selecciones_cashout} cerradas por cash out`:""}`;
 const doctorPeriod=s=>`<article class="doctor-period"><div><strong>${esc(s.label)}</strong><small>${doctorRecord(s)} · ${doctorSelectionRecord(s)}</small></div><div class="doctor-period-money"><span>Apostado <b>${money(s.apostado_centavos)}</b></span><span>Cobrado <b>${money(s.cobrado_centavos)}</b></span><span>Neto total <b class="${s.resultado_total_centavos>=0?'positive':'negative'}">${signedMoney(s.resultado_total_centavos)}</b></span></div></article>`;
 document.querySelector('#doctor-count').textContent=decodeText(`${totalDoctor.cupones} cupones identificados`);
@@ -87,7 +87,7 @@ document.querySelector('#doctor-summary').innerHTML=[
  ['Cupones',doctorRecord(totalDoctor),`${totalDoctor.cupones} ratificados por Orlando`],
  ['Selecciones',doctorSelectionRecord(totalDoctor),`${totalDoctor.selecciones} selecciones contabilizadas`],
  ['Dinero apostado',money(totalDoctor.apostado_centavos),totalDoctor.apuesta_gratis_centavos?`dinero propio · ${money(totalDoctor.apuesta_gratis_centavos)} en apuestas gratis aparte`:'solo cupones del Doctor'],
- ['Dinero cobrado',money(totalDoctor.cobrado_centavos),'cobros liquidados'],
+ ['Dinero cobrado',money(totalDoctor.cobrado_centavos),totalDoctor.cupones_anulados?'cobros y devoluciones liquidados':'cobros liquidados'],
  ['Neto de apuestas',signedMoney(totalDoctor.resultado_apuestas_centavos),'cobrado menos apostado'],
  ['Neto total',signedMoney(totalDoctor.resultado_total_centavos),'incluye la inversión inicial']
 ].map(([a,b,c])=>`<article class="metric doctor-metric"><div class="label">${a}</div><div class="value">${b}</div><div class="sub">${c}</div></article>`).join('');
