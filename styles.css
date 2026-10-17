@@ -64,3 +64,17 @@ footer{max-width:1240px;margin:auto;border-top:1px solid var(--line);padding:22p
 #propuesta-semana6{min-width:0;max-width:100%;overflow-wrap:anywhere}.proposal-w6{min-width:0;max-width:100%;box-sizing:border-box;margin-block:16px;overflow-wrap:anywhere}.proposal-w6 ul{padding-left:20px}.proposal-w6 li{margin-block:8px}
 
 .polla-standings{width:100%;border-collapse:collapse}.polla-standings th,.polla-standings td{padding:.75rem;text-align:left;border-bottom:1px solid #23384b}.polla-standings th:last-child,.polla-standings td:last-child{text-align:right}.polla-orlando{background:#173c55;font-weight:700}.polla-match{min-width:0}.polla-results{flex-wrap:wrap}.timeline-block.polla-match{background:#112c36;border-color:#346858}
+
+/* Futures interests remain inside their event, below bets and Fantasy. */
+.long-term-guide{margin-top:1rem;border-left:3px solid #d7ac53;overflow-wrap:anywhere}
+.long-term-main{font-weight:700;line-height:1.5}
+.long-term-guide h5{font-size:.95rem;margin:1rem 0 .5rem}
+.long-term-targets,.long-term-stats{padding-left:1.2rem}
+.long-term-targets li,.long-term-stats li{margin:.7rem 0;line-height:1.5}
+.long-term-guide small{display:block;color:var(--muted,#a9b8ca);margin-top:.25rem}
+.long-term-conflicts{border:1px solid #c49443;border-radius:.5rem;padding:.5rem .8rem}
+.long-term-amounts{margin-top:1rem}
+.long-term-amounts summary{cursor:pointer;font-weight:600}
+.long-term-coupon{display:flex;flex-wrap:wrap;gap:.35rem 1rem;padding:.75rem 0;border-bottom:1px solid #344254}
+.long-term-coupon strong{flex-basis:100%}
+.long-term-note{font-size:.8rem;margin-bottom:0}
