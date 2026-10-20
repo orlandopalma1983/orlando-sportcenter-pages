@@ -200,6 +200,6 @@ document.querySelectorAll('#fantasy .fantasy-results-heading .eyebrow')[0].textC
 document.querySelectorAll('#fantasy .fantasy-results-heading .eyebrow')[1].textContent=`RESULTADOS · SEMANA ${resultsWeek}`;
 document.querySelectorAll('#fantasy .lineup-notice')[1].textContent='Pujas, propuestas y adjudicaciones conservan su estado individual. Ningún movimiento fue ejecutado por el asistente.';
 document.querySelector('#tablas h2').textContent=decodeText(`Tablas · Semana ${resultsWeek} al corte`);
-document.querySelector('#tablas .notice').textContent=decodeText('Semana 6: solo partidos revisados al corte. Acumulado: cierre de Semana 5 más aportes revisados. Los récords y VP son provisionales; Washington–San Francisco sigue pendiente.');
+document.querySelector('#tablas .notice').textContent=decodeText('Semana 6 completa: todos los partidos revisados. COPPER 142: base V.P. de la captura hasta S5 más V.P. ganados en S6; acumulado calculado por el dashboard.');
 
 };
