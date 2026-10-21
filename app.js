@@ -7,8 +7,9 @@ const money=c=>new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',mi
 const foreignMoney=(c,currency)=>`${currency} $${new Intl.NumberFormat('es-CL',{minimumFractionDigits:c%100?2:0,maximumFractionDigits:2}).format(c/100)}`;
 const num=n=>n==null?'—':new Intl.NumberFormat('es-CL',{minimumFractionDigits:2,maximumFractionDigits:2}).format(n??0);
 const esc=v=>String(v??'');
-const statusClass=s=>/PERD/i.test(s)?'lost':/GANAD|CASHOUT/i.test(s)?'win':'playing';
-const legIcon=s=>s==='CASHOUT'?'💰':/ANULAD/i.test(s)?'⚪':/ACERT/i.test(s)?'🟢':/PERD/i.test(s)?'🔴':'🟡';
+const statusClass=s=>/RESUELTO_POR_ORLANDO|REVISAD[OA]_POR_ORLANDO/.test(s)?'closed':/PERD/i.test(s)?'lost':/GANAD|CASHOUT/i.test(s)?'win':'playing';
+const statusLabel=s=>s==='RESUELTO_POR_ORLANDO'?'RESUELTO · REVISADO':/REVISAD[OA]_POR_ORLANDO/.test(s)?'REVISADO':s;
+const legIcon=s=>/REVISAD[OA]_POR_ORLANDO/.test(s)?'☑️':s==='CASHOUT'?'💰':/ANULAD/i.test(s)?'⚪':/ACERT/i.test(s)?'🟢':/PERD/i.test(s)?'🔴':'🟡';
 const sportIcon=s=>({NFL:'🏈',NCAA:'🏈',F1:'🏎️',AUTOMOVILISMO:'🏎️',MLB:'⚾',NHL:'🏒',NBA:'🏀',WNBA:'🏀',FÚTBOL:'⚽',FUTBOL:'⚽',SOCCER:'⚽',TENIS:'🎾',TENNIS:'🎾',HÍPICA:'🏇',HIPICA:'🏇'}[String(s||'').toUpperCase()]||'🏅');
 const playerIdentity=(position,number,team)=>position&&team?`${esc(position)}${number==null?'':` · #${esc(number)}`} · ${esc(team)}`:'';
 const propIdentity=p=>playerIdentity(p.posicion_jugador,p.dorsal_jugador,p.equipo_jugador);
@@ -77,8 +78,8 @@ document.querySelector('#hipica-coupon-list').innerHTML=hipicaCoupons.map(c=>`<a
 
 const DS=D.estadisticas_doctor,totalDoctor=DS.total;
 const signedMoney=c=>c>0?`+${money(c)}`:c<0?`-${money(-c)}`:money(0);
-const doctorRecord=s=>`${s.cupones_ganados} ganados · ${s.cupones_perdidos} perdidos · ${s.cupones_pendientes} pendientes${s.cupones_cashout?` · ${s.cupones_cashout} cash out`:""}${s.cupones_anulados?` · ${s.cupones_anulados} anulados`:""}`;
-const doctorSelectionRecord=s=>`${s.selecciones_acertadas} aciertos · ${s.selecciones_perdidas} pérdidas · ${s.selecciones_pendientes} pendientes${s.selecciones_anuladas?` · ${s.selecciones_anuladas} anuladas`:""}${s.selecciones_cashout?` · ${s.selecciones_cashout} cerradas por cash out`:""}`;
+const doctorRecord=s=>`${s.cupones_ganados} ganados · ${s.cupones_perdidos} perdidos · ${s.cupones_pendientes} pendientes${s.cupones_cashout?` · ${s.cupones_cashout} cash out`:""}${s.cupones_anulados?` · ${s.cupones_anulados} anulados`:""}${s.cupones_revisados_sin_resultado?` · ${s.cupones_revisados_sin_resultado} revisados`:''}`;
+const doctorSelectionRecord=s=>`${s.selecciones_acertadas} aciertos · ${s.selecciones_perdidas} pérdidas · ${s.selecciones_pendientes} pendientes${s.selecciones_anuladas?` · ${s.selecciones_anuladas} anuladas`:""}${s.selecciones_cashout?` · ${s.selecciones_cashout} cerradas por cash out`:""}${s.selecciones_revisadas_sin_resultado?` · ${s.selecciones_revisadas_sin_resultado} revisadas`:''}`;
 const doctorPeriod=s=>`<article class="doctor-period"><div><strong>${esc(s.label)}</strong><small>${doctorRecord(s)} · ${doctorSelectionRecord(s)}</small></div><div class="doctor-period-money"><span>Apostado <b>${money(s.apostado_centavos)}</b></span><span>Cobrado <b>${money(s.cobrado_centavos)}</b></span><span>Neto total <b class="${s.resultado_total_centavos>=0?'positive':'negative'}">${signedMoney(s.resultado_total_centavos)}</b></span></div></article>`;
 document.querySelector('#doctor-count').textContent=decodeText(`${totalDoctor.cupones} cupones identificados`);
 document.querySelector('#doctor-investment').innerHTML=`<strong>Inversión inicial incluida:</strong> USD ${new Intl.NumberFormat('es-CL').format(DS.inversion_inicial_usd_centavos/100)} × ${num(DS.tipo_cambio_clp_usd)} CLP/USD = <strong>${money(totalDoctor.inversion_inicial_centavos)}</strong>. Esta inversión se descuenta una sola vez del resultado total.`;
@@ -91,7 +92,7 @@ document.querySelector('#doctor-summary').innerHTML=[
  ['Neto de apuestas',signedMoney(totalDoctor.resultado_apuestas_centavos),'cobrado menos apostado'],
  ['Neto total',signedMoney(totalDoctor.resultado_total_centavos),'incluye la inversión inicial']
 ].map(([a,b,c])=>`<article class="metric doctor-metric"><div class="label">${a}</div><div class="value">${b}</div><div class="sub">${c}</div></article>`).join('');
-document.querySelector('#doctor-coupons').innerHTML=DS.cupones_detalle.map(c=>`<article class="doctor-coupon-state"><div class="doctor-coupon-state-head"><div><strong>${esc(c.codigo)}</strong><small>${esc(c.evento)}</small>${c.nota_liquidacion?`<small>${esc(c.nota_liquidacion)}</small>`:''}</div><span class="status ${statusClass(c.estado)}">${c.estado==='ACTIVO'?'PENDIENTE':esc(c.estado)}</span></div><ul>${c.selecciones.map(s=>`<li><span>${legIcon(s.estado)}</span><span>${esc(s.seleccion)}${s.evento?`<small>${esc(s.evento)}</small>`:""}<small>${esc(s.estado)}</small></span></li>`).join('')}</ul></article>`).join('');
+document.querySelector('#doctor-coupons').innerHTML=DS.cupones_detalle.map(c=>`<article class="doctor-coupon-state"><div class="doctor-coupon-state-head"><div><strong>${esc(c.codigo)}</strong><small>${esc(c.evento)}</small>${c.nota_liquidacion?`<small>${esc(c.nota_liquidacion)}</small>`:''}</div><span class="status ${statusClass(c.estado)}">${c.estado==='ACTIVO'?'PENDIENTE':esc(statusLabel(c.estado))}</span></div><ul>${c.selecciones.map(s=>`<li><span>${legIcon(s.estado)}</span><span>${esc(s.seleccion)}${s.evento?`<small>${esc(s.evento)}</small>`:""}<small>${esc(statusLabel(s.estado))}</small></span></li>`).join('')}</ul></article>`).join('');
 document.querySelector('#doctor-daily').innerHTML=DS.diario.map(doctorPeriod).join('');
 document.querySelector('#doctor-weekly').innerHTML=DS.semanal.map(doctorPeriod).join('');
 
