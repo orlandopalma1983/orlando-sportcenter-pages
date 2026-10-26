@@ -150,7 +150,8 @@ document.querySelector('#fantasy-list').innerHTML=D.fantasy.map(l=>`<article cla
 const officialRosters=D.rosters_actuales_semana7||D.rosters_actuales_semana6;
 const lineupActivityLabel=officialRosters?.semana>(D.meta.semana_resultados||0)?` · previa Semana ${officialRosters.semana}`:activityLabel;
 const showGuillotineRosters=officialRosters?.mostrar_rosters_guillotine!==false;
-const ownRosters=(officialRosters?.propios||D.alineaciones_propuestas).filter(l=>showGuillotineRosters||l.codigo!=='BRONZE 112');
+const showOwnGuillotineRoster=officialRosters?.mostrar_plantilla_guillotine_propia??showGuillotineRosters;
+const ownRosters=(officialRosters?.propios||D.alineaciones_propuestas).filter(l=>showOwnGuillotineRoster||l.codigo!=='BRONZE 112');
 const rivalByLeague=Object.fromEntries((officialRosters?.rivales||D.rivales_probables).map(l=>[l.codigo,l]));
 if(officialRosters)document.querySelector('#lineup-comparisons').insertAdjacentHTML('beforebegin',`<p class="official-roster-cut"><strong>Plantillas oficiales · Semana ${officialRosters.semana} · ${esc(officialRosters.corte)}</strong><br>${esc(officialRosters.fuente)} Los puestos vacíos figuran expresamente; las formaciones pueden cambiar antes del kickoff.</p>`);
 const projected=p=>p.puntos_proyectados==null?'pendiente':`${num(p.puntos_proyectados)} pts`;
