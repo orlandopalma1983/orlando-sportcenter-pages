@@ -147,13 +147,13 @@ const isPlayingNow=p=>p.semana&&p.semana>(D.meta.semana_resultados||0)?!!p.jugan
   :p.jugando_ahora;
 document.querySelector('#fantasy-list').innerHTML=D.fantasy.map(l=>`<article class="league"><div><div class="league-name">${l.codigo}</div><div class="league-format">${l.formato}</div><span class="status ${statusClass(l.estado_semana)}">${l.estado_semana}</span></div><div class="score"><div class="score-block"><span>🟢 TÚ</span><strong>${num(l.marcador_propio)}</strong></div><div class="versus">${l.marcador_rival==null?'—':'VS'}</div><div class="score-block"><span>🔴 ${l.rival||'SIN RIVAL H2H'}</span><strong>${l.marcador_rival==null?'—':num(l.marcador_rival)}</strong></div></div><div class="league-copy"><p><strong>${l.condicion_resultado}</strong></p><p class="muted">${l.nota_clasificacion}</p><p class="muted">${l.posibilidad_aumentar}</p><p class="live-count"><strong>JUGANDO AHORA:</strong> 🟢 ${liveCount(l.codigo,"propio",l.jugando_ahora_propio)}${l.marcador_rival==null?' · sin rival H2H':` vs 🔴 ${liveCount(l.codigo,"rival",l.jugando_ahora_rival)}`}${activityLabel}</p></div></article>`).join('');
 
-const officialRosters=D.rosters_actuales_semana7||D.rosters_actuales_semana6;
+const officialRosters=D.rosters_actuales_semana8||D.rosters_actuales_semana7||D.rosters_actuales_semana6;
 const lineupActivityLabel=officialRosters?.semana>(D.meta.semana_resultados||0)?` · previa Semana ${officialRosters.semana}`:activityLabel;
 const showGuillotineRosters=officialRosters?.mostrar_rosters_guillotine!==false;
 const showOwnGuillotineRoster=officialRosters?.mostrar_plantilla_guillotine_propia??showGuillotineRosters;
 const ownRosters=(officialRosters?.propios||D.alineaciones_propuestas).filter(l=>showOwnGuillotineRoster||l.codigo!=='BRONZE 112');
 const rivalByLeague=Object.fromEntries((officialRosters?.rivales||D.rivales_probables).map(l=>[l.codigo,l]));
-if(officialRosters)document.querySelector('#lineup-comparisons').insertAdjacentHTML('beforebegin',`<p class="official-roster-cut"><strong>Plantillas oficiales · Semana ${officialRosters.semana} · ${esc(officialRosters.corte)}</strong><br>${esc(officialRosters.fuente)} Los puestos vacíos figuran expresamente; las formaciones pueden cambiar antes del kickoff.</p>`);
+if(officialRosters)document.querySelector('#lineup-comparisons').insertAdjacentHTML('beforebegin',`<p class="official-roster-cut"><strong>${officialRosters.confirmada_semana8===false?'Plantillas actuales · base preliminar':'Plantillas oficiales'} · Semana ${officialRosters.semana} · ${esc(officialRosters.corte)}</strong><br>${esc(officialRosters.fuente)} Los puestos vacíos figuran expresamente; las formaciones pueden cambiar antes del kickoff.</p>`);
 const projected=p=>p.puntos_proyectados==null?'pendiente':`${num(p.puntos_proyectados)} pts`;
 const scoreNow=p=>p.puntos_actuales==null?'pendiente':`${num(p.puntos_actuales)} pts`;
 const participation=p=>p.estado_participacion==='INACTIVO'?'INACTIVO':isPlayingNow(p)?'EN JUEGO · '+(D.fantasy_actividad_actual?.hora_chile||'CORTE REVISADO'):p.estado_participacion==='NO_JUGO'?'no jugó':p.partido_finalizado?'final':p.corte_revisado?esc(p.corte_revisado.replaceAll('_',' ').toLowerCase()):p.estado==='TITULAR'?'por jugar':p.estado.toLowerCase();
@@ -206,5 +206,7 @@ document.querySelectorAll('#fantasy .fantasy-results-heading .eyebrow')[1].textC
 document.querySelectorAll('#fantasy .lineup-notice')[1].textContent='Pujas, propuestas y adjudicaciones conservan su estado individual. Ningún movimiento fue ejecutado por el asistente.';
 document.querySelector('#tablas h2').textContent=decodeText(`Tablas · Semana ${resultsWeek} al corte`);
 document.querySelector('#tablas .notice').textContent=decodeText('Semana 6 completa: todos los partidos revisados. COPPER 142: base V.P. de la captura hasta S5 más V.P. ganados en S6; acumulado calculado por el dashboard.');
+
+if(D.meta.version_datos==='20261027-dal-phi-final'){document.querySelector('#tablas h2').textContent='Tablas finales · Semana 7';document.querySelector('#tablas .notice').textContent='Semana 7 completada. Tablas calculadas desde la base S6 y los catorce partidos finales, con TE Premium corregido en COPPER 142. La API de standings aún conserva la base S6; pendiente ratificación de DataForce.';}
 
 };
