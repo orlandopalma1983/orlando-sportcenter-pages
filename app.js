@@ -36,7 +36,7 @@ document.querySelector('#polla-own-summary').textContent=decodeText(`Polla revis
 const saldoBetanoCalculado=['CALCULADO','CALCULADO_DESDE_COMPROBANTES'].includes(D.resumen.saldo_betano_validacion);
 const saldoCuponesPendiente=D.resumen.saldo_betano_validacion==='PENDIENTE_INCLUSION_CUPONES';
 const saldoBetanoPosterior=D.resumen.saldo_betano_validacion==='CALCULADO_POSTERIOR_A_CONFIRMACION';
-const saldoBetanoValido=D.resumen.saldo_betano_disponible_centavos>=0;
+const saldoBetanoValido=Number.isFinite(D.resumen.saldo_betano_disponible_centavos)&&D.resumen.saldo_betano_disponible_centavos>=0;
 const saldoBetanoConfirmado=['CONFIRMADO_POR_ORLANDO','BASE_REESTABLECIDA_POR_ORLANDO'].includes(D.resumen.saldo_betano_validacion)&&D.resumen.saldo_betano_confirmado_usuario_centavos===D.resumen.saldo_betano_disponible_centavos;
 const saldoBetanoInformado=D.resumen.saldo_betano_validacion==='SALDO_INFORMADO_NO_CONCILIADO'&&D.resumen.saldo_betano_libro_al_observar_centavos===D.resumen.saldo_betano_disponible_centavos;
 const saldoBetanoReferenciaPendiente=!!D.resumen.saldo_betano_referencia&&D.resumen.saldo_betano_diferencia_centavos!==0;
@@ -46,7 +46,7 @@ const metrics=[
  ['Cobro potencial total',money(D.resumen.cobro_potencial_centavos),D.liquidaciones_pendientes?.length?'Provisional: liquidación por empate pendiente':'si aciertan los cupones vigentes'],
  ['Ganancia neta potencial',money(D.resumen.ganancia_neta_centavos),D.liquidaciones_pendientes?.length?'Provisional: liquidación por empate pendiente':'sobre el capital activo']];
 if(D.resumen.bono_gratis_disponible_centavos!=null)metrics.push(['Apuestas gratis por utilizar',money(D.resumen.bono_gratis_disponible_centavos),`${money(D.resumen.bono_gratis_otorgado_centavos)} otorgados − ${money(D.resumen.bono_gratis_utilizado_centavos)} utilizados · remanente calculado, separado del efectivo`]);
-if(saldoBetanoInformado||saldoBetanoReferenciaPendiente)metrics.push(
+if((saldoBetanoInformado||saldoBetanoReferenciaPendiente)&&!saldoCuponesPendiente)metrics.push(
  ['Libro pendiente de conciliar',money(saldoBetanoReferenciaPendiente?D.resumen.saldo_betano_libro_calculado_centavos:D.resumen.saldo_betano_disponible_centavos),'Movimientos registrados · conciliación pendiente'],
  ['Diferencia pendiente',money(D.resumen.saldo_betano_diferencia_centavos),'Saldo informado menos saldo calculado · causa por verificar']);
 document.querySelector('#summary-cards').innerHTML=metrics.map(([a,b,c])=>`<article class="metric"><div class="label">${a}</div><div class="value">${b}</div><div class="sub">${c}</div></article>`).join('');
