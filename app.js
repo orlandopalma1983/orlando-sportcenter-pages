@@ -192,7 +192,7 @@ document.querySelectorAll('#fantasy .fantasy-results-heading .eyebrow')[0].textC
 document.querySelectorAll('#fantasy .fantasy-results-heading .eyebrow')[1].textContent=`RESULTADOS · SEMANA ${resultsWeek}`;
 document.querySelectorAll('#fantasy .lineup-notice')[1].textContent='Pujas, propuestas y adjudicaciones conservan su estado individual. Ningún movimiento fue ejecutado por el asistente.';
 document.querySelector('#tablas h2').textContent=decodeText(`Tablas · Semana ${resultsWeek} al corte`);
-document.querySelector('#tablas .notice').textContent=decodeText('Semana 6 completa: todos los partidos revisados. COPPER 142: base V.P. de la captura hasta S5 más V.P. ganados en S6; acumulado calculado por el dashboard.');
+document.querySelector('#tablas .notice').textContent=decodeText(D.meta.semana_resultados===8?'Semana 8 provisional: base de cierre S7 más Packers–Panthers FINAL ya revisado. El bloque de las 15:00 permanece en PREVIA. Récords confirmados hasta S7; V.P. S8 provisionales, sin acreditación final.':'Semana 6 completa: todos los partidos revisados. COPPER 142: base V.P. de la captura hasta S5 más V.P. ganados en S6; acumulado calculado por el dashboard.');
 
 if(D.meta.version_datos==='20261027-dal-phi-final'){document.querySelector('#tablas h2').textContent='Tablas finales · Semana 7';document.querySelector('#tablas .notice').textContent='Semana 7 completada. Tablas calculadas desde la base S6 y los catorce partidos finales, con TE Premium corregido en COPPER 142. La API de standings aún conserva la base S6; pendiente ratificación de DataForce.';}
 
