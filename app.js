@@ -196,4 +196,23 @@ document.querySelector('#tablas .notice').textContent=decodeText(D.meta.semana_r
 
 if(D.meta.version_datos==='20261027-dal-phi-final'){document.querySelector('#tablas h2').textContent='Tablas finales · Semana 7';document.querySelector('#tablas .notice').textContent='Semana 7 completada. Tablas calculadas desde la base S6 y los catorce partidos finales, con TE Premium corregido en COPPER 142. La API de standings aún conserva la base S6; pendiente ratificación de DataForce.';}
 
+// Owner instruction 1nov: retain all reviewed points, summarize only live games.
+if(D.vista_nfl?.solo_en_juego){
+ const fantasySection=document.querySelector('#fantasy');
+ fantasySection.querySelector('.section-heading h2').textContent='Totales Fantasy y partidos en juego';
+ document.querySelectorAll('#revision-semanal, #propuesta-semana6, #lineup-comparisons, .official-roster-cut, #waiver-proposals, #fantasy .fantasy-results-heading').forEach(e=>e.hidden=true);
+ const totals=document.querySelector('#fantasy-list');
+ const wrap=fantasySection.querySelector('.fantasy-cut-wrap');
+ const heading=document.createElement('h3');heading.textContent='Totales de las cinco ligas';
+ fantasySection.insertBefore(heading,wrap);fantasySection.insertBefore(totals,wrap);
+ const notice=document.createElement('p');notice.className='rule-note';notice.textContent='Los partidos ya revisados están incluidos en los totales. Detalle sólo de partidos en juego al corte '+D.corte_partido.hora_chile+' Chile.';
+ fantasySection.insertBefore(notice,wrap);
+ // Keep the full rosters and history in the payload; no historical player is repeated here.
+ const leagues=D.corte_partido.ligas;
+ const states=D.fantasy_actividad_actual?.estados_equipos||{};
+ const games=(D.corte_partido.partidos||[]).filter(g=>g.corte!=='FINAL'&&(states[g.visitante]==='in'||states[g.local]==='in'));
+ document.querySelector('#fantasy-live-cuts').innerHTML=games.length?games.map(g=>`<article class="fantasy-cut-card clean-live-game" data-event-id="${esc(g.evento_id)}"><h3>🏈 ${esc(g.visitante)}–${esc(g.local)}</h3>${gameCut(g)}<p>Corte guardado: ${esc(D.corte_partido.hora_chile)} Chile · Q${g.periodo} · ${esc(g.reloj)}</p>${leagues.map(l=>{const ps=Object.fromEntries(['propio','rival'].map(side=>[side,l[side].jugadores.filter(p=>p.evento_nfl===g.evento_id&&isPlayingNow(p)&&!p.partido_finalizado)]));if(!ps.propio.length&&!ps.rival.length)return '';return `<section class="clean-live-league"><h4>${esc(l.codigo)}</h4><div class="timeline-columns">${['propio','rival'].map(side=>`<section class="timeline-block ${side==='propio'?'own':'rival'}"><h4>${side==='propio'?'🟢 TÚ':'🔴 RIVAL · '+esc(l[side].nombre||'Sin rival H2H')}</h4>${ps[side].length?`<ul class="timeline-players">${ps[side].map(p=>`<li>${esc(p.nombre)}: ${num(p.puntos_actuales)} (${num(p.puntos_proyectados)})<small>${playerIdentity(p.posicion,p.dorsal,p.equipo_nfl)}</small></li>`).join('')}</ul>`:'<p>Sin jugadores en este partido</p>'}</section>`).join('')}</div></section>`}).join('')}</article>`).join(''):'<p class="notice">No hay partidos en juego en el último corte revisado.</p>';
+ wrap.querySelector('.reveal').textContent='👁 Mostrar partidos en juego';
+}
+
 };
