@@ -21,7 +21,7 @@ const statusClass=s=>/RESUELTO_POR_ORLANDO|REVISAD[OA]_POR_ORLANDO/.test(s)?'clo
 const couponResult=c=>c.resultado_deportivo||c.estado;
 const statusLabel=s=>s==='RESUELTO_POR_ORLANDO'?'RESUELTO · REVISADO':/REVISAD[OA]_POR_ORLANDO/.test(s)?'REVISADO':s;
 const legIcon=s=>/REVISAD[OA]_POR_ORLANDO/.test(s)?'☑️':s==='CASHOUT'?'💰':/ANULAD/i.test(s)?'⚪':/ACERT/i.test(s)?'🟢':/PERD/i.test(s)?'🔴':'🟡';
-const sportIcon=s=>({NFL:'🏈',NCAA:'🏈',F1:'🏎️',AUTOMOVILISMO:'🏎️',MLB:'⚾',NHL:'🏒',NBA:'🏀',WNBA:'🏀',FÚTBOL:'⚽',FUTBOL:'⚽',SOCCER:'⚽',TENIS:'🎾',TENNIS:'🎾',HÍPICA:'🏇',HIPICA:'🏇'}[String(s||'').toUpperCase()]||'🏅');
+const sportIcon=s=>({NFL:'🏈',NCAA:'🏈',NCAAB:'🏀',F1:'🏎️',AUTOMOVILISMO:'🏎️',MLB:'⚾',NHL:'🏒',NBA:'🏀',WNBA:'🏀',FÚTBOL:'⚽',FUTBOL:'⚽',SOCCER:'⚽',TENIS:'🎾',TENNIS:'🎾',HÍPICA:'🏇',HIPICA:'🏇'}[String(s||'').toUpperCase()]||'🏅');
 const playerIdentity=(position,number,team)=>position&&team?`${esc(position)}${number==null?'':` · #${esc(number)}`} · ${esc(team)}`:'';
 const propIdentity=p=>playerIdentity(p.posicion_jugador,p.dorsal_jugador,p.equipo_jugador);
 const cutClass=s=>/ACERTADA|SUPERADA|CUMPLIENDO/.test(s)?'cut-good':/PERDIDA|FALLANDO/.test(s)?'cut-bad':'cut-pending';
