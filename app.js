@@ -164,6 +164,12 @@ if(D.duelos_semana8)document.querySelectorAll('#standings-list .standings').forE
  article.querySelector('h3').insertAdjacentHTML('afterend',`<section class="rule-note all-matchups"><h4>Los seis duelos · Semana 8 al corte</h4><p>Entre paréntesis: titulares que faltan por jugar.</p><ul>${league.partidos.map(p=>`<li class="weekly-duel"><strong>${esc(p.equipo_a)} ${num(p.puntos_a)} (${p.por_jugar_a}) — ${num(p.puntos_b)} (${p.por_jugar_b}) ${esc(p.equipo_b)}</strong></li>`).join('')}</ul></section>`);
 });
 
+// Current reviewed Week 9 points are separate from closed standings.
+if(D.corte_partido?.semana===9){
+ const leagues=D.corte_partido.ligas.filter(l=>l.codigo!=='BRONZE 112');
+ document.querySelector('#standings-list').insertAdjacentHTML('afterbegin',`<article id="reviewed-week9-points" class="standings"><h3>SEMANA 9 · PUNTOS REVISADOS</h3><p class="rule-note">Sólo partidos y cortes autorizados. Entre paréntesis: proyección inicial. Semana incompleta; récords y VP del cierre S8 se conservan.</p><div class="table-scroll"><table><thead><tr><th>Liga</th><th>Tú (proyección)</th><th>Rival (proyección)</th><th>Futuros tú · rival</th></tr></thead><tbody>${leagues.map(l=>`<tr><td>${esc(l.codigo)}</td><td>${num(l.propio.puntos)} (${num(l.propio.proyeccion)})</td><td>${num(l.rival.puntos)} (${num(l.rival.proyeccion)})</td><td>${l.propio.por_jugar} · ${l.rival.por_jugar}</td></tr>`).join('')}</tbody></table></div></article>`);
+}
+
 // Forecast totals belong to the current week, separate from closed weekly results.
 const guillotineForecastOwn=officialRosters?.propios?.find(t=>t.codigo==='BRONZE 112');
 if(officialRosters?.semana===9&&guillotineForecastOwn&&officialRosters.guillotine_otros?.length){
