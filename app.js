@@ -1,7 +1,15 @@
 'use strict';
 window.renderSportCenter=function(payload){
 const decodeText=v=>String(v??'').replace(/&(amp|lt|gt|quot|#39|#96);/g,(_,k)=>({amp:'&',lt:'<',gt:'>',quot:'\"','#39':"'",'#96':'`'}[k]));
-const D=payload;
+// Orlando retired BRONZE 112 on 11 Nov. Project the view without deleting history.
+function activeFantasyView(value, key='') {
+  const retired=row=>[row?.codigo,row?.liga_codigo,row?.liga,typeof row==='string'?row:null]
+    .some(code=>typeof code==='string'&&code.replace(/\s+/g,'').toUpperCase()==='BRONZE112');
+  if(Array.isArray(value))return key==='guillotine_otros'?[]:value.filter(row=>!retired(row)).map(row=>activeFantasyView(row));
+  if(value&&typeof value==='object')return Object.fromEntries(Object.entries(value).map(([name,item])=>[name,activeFantasyView(item,name)]));
+  return value;
+}
+const D=activeFantasyView(payload);
 // UTC and Chile offsets represent instants; never sort their ISO strings as text.
 const timelineTime=event=>{
   if(!event.fecha_hora)return Infinity;
