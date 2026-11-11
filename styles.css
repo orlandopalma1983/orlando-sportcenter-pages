@@ -86,3 +86,6 @@ footer{max-width:1240px;margin:auto;border-top:1px solid var(--line);padding:22p
 
 /* Week10 advice: long offer labels remain readable on phones. */
 #waiver-proposals .waiver-card{min-width:0}#waiver-proposals .lineup-head{flex-wrap:wrap}#waiver-proposals .status{white-space:normal;overflow-wrap:anywhere}@media(max-width:600px){#waiver-proposals .waiver-move{grid-template-columns:30px minmax(0,1fr)}#waiver-proposals .waiver-move>em{grid-column:2;max-width:100%;white-space:normal}#waiver-proposals .waiver-move>div{min-width:0;overflow-wrap:anywhere}#weekly-review .weekly-review-head{flex-wrap:wrap}}
+
+/* Long waiver summaries remain within their review cards. */
+#weekly-review>.weekly-review-card{min-width:0;overflow-wrap:anywhere}
