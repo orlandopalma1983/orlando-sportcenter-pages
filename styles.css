@@ -89,3 +89,12 @@ footer{max-width:1240px;margin:auto;border-top:1px solid var(--line);padding:22p
 
 /* Long waiver summaries remain within their review cards. */
 #weekly-review>.weekly-review-card{min-width:0;overflow-wrap:anywhere}
+
+/* S10 opponents are independent of the historical S9 matchup. */
+#standings-list .mine-row{background:#dceefe;color:#123a60;font-weight:700}
+#standings-list .rival-row{background:#fff0c4;color:#654400;font-weight:700;border-left:4px solid #b37700}
+#standings-list .mine-row strong,#standings-list .rival-row strong{font-weight:800}
+.standings-team-label{display:inline-block;margin-left:.45rem;font-size:.75rem;font-weight:800;white-space:nowrap}
+.standings-s9-history{margin-top:1rem;padding-top:.8rem;border-top:1px solid #d6dce6}
+.standings-s9-history summary{cursor:pointer;font-weight:700;padding:.5rem 0}
+.standings-closed-summary{margin-bottom:1.5rem}
