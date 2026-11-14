@@ -83,7 +83,7 @@ document.querySelector('#refresh-dashboard').addEventListener('click',()=>locati
     if(!crypto.subtle)throw Error('Se necesita HTTPS');
     const response=await fetch('sealed.json?t='+Date.now(),{cache:'no-store',credentials:'omit',redirect:'error',referrerPolicy:'no-referrer'});
     if(!response.ok)throw Error('Publicación no disponible');
-    const text=await response.text();if(text.length>16*1024*1024)throw Error('Archivo demasiado grande');
+    const text=await response.text();if(text.length>32*1024*1024)throw Error('Archivo demasiado grande');
     envelope=JSON.parse(text);
     if(envelope.version!==1||envelope.kdf!=='PBKDF2-SHA256'||envelope.iterations!==600000||bytes(envelope.salt).length!==32||bytes(envelope.iv).length!==12)throw Error('Formato no válido');
     unlock.disabled=false;
