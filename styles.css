@@ -98,3 +98,6 @@ footer{max-width:1240px;margin:auto;border-top:1px solid var(--line);padding:22p
 .standings-s9-history{margin-top:1rem;padding-top:.8rem;border-top:1px solid #d6dce6}
 .standings-s9-history summary{cursor:pointer;font-weight:700;padding:.5rem 0}
 .standings-closed-summary{margin-bottom:1.5rem}
+
+/* Keep weekly progress readable on phones, including long source references. */
+.future-coupon{min-width:0}.future-coupon .pick-progress{min-width:0;overflow-wrap:anywhere}
