@@ -234,7 +234,7 @@ if(!D.meta.semana_resultados_final&&D.posiciones_semana9_archivo&&D.duelos_seman
 // Active S11 previews and historical S10 closure are intentionally separate.
 if(D.rosters_actuales_semana11){
  document.querySelector('#fantasy h2').textContent='Semana 11 · tus alineaciones y rivales';
- document.querySelector('#lineup-comparisons').insertAdjacentHTML('beforebegin','<p class="notice">Proyecciones estimadas: ESPN ajustado a reglas de cada liga. Si falta, promedio individual S1–S10; el origen figura por jugador. BYE vale 0 porque no tiene partido.</p>');
+ document.querySelector('#lineup-comparisons').insertAdjacentHTML('beforebegin','<p class="notice">Proyecciones estimadas: ESPN ajustado a reglas de cada liga. Fuente ESPN S11 adaptada al scoring. Sin proyección verificada: pendiente. La proyección no confirma el alta médica. BYE vale 0 porque no tiene partido.</p>');
  document.querySelector('#fantasy-list').insertAdjacentHTML('beforebegin','<h3>Resultados finales · Semana 10</h3>');
  document.querySelector('#fantasy-live-cuts').closest('.fantasy-cut-wrap').querySelector('button').textContent='👁 Ver partidos y estadísticas cerradas de S10';
  document.querySelector('#fantasy-live-cuts').closest('.fantasy-cut-wrap').querySelector('button').dataset.show='👁 Ver partidos y estadísticas cerradas de S10';
