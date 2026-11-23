@@ -6,7 +6,7 @@ const unlock=document.querySelector('#unlock');
 const lock=document.querySelector('#lock');
 const inputPanel=document.querySelector('#login-controls');
 const openPanel=document.querySelector('#open-panel');
-const maxEnvelopeBytes=64*1024*1024;
+const maxEnvelopeBytes=48*1024*1024;
 const bytes=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
 let envelope=null;
 const listKeys=['cupones','apuestas_largo_plazo','fantasy','alineaciones_propuestas','rivales_probables','waivers_propuestos','posiciones','cronologia','fantasy_cortes'];
@@ -51,12 +51,70 @@ async function derive(secret){
   const material=await crypto.subtle.importKey('raw',new TextEncoder().encode(secret),'PBKDF2',false,['deriveKey']);
   return crypto.subtle.deriveKey({name:'PBKDF2',salt:bytes(envelope.salt),iterations:600000,hash:'SHA-256'},material,{name:'AES-GCM',length:256},false,['decrypt']);
 }
-function decryptPublication(key){
-  return crypto.subtle.decrypt({name:'AES-GCM',iv:bytes(envelope.iv),additionalData:new TextEncoder().encode('SportCenter sealed snapshot v1'),tagLength:128},key,bytes(envelope.ciphertext));
+function decryptPublication(key,publication=envelope){
+  return crypto.subtle.decrypt({name:'AES-GCM',iv:bytes(publication.iv),additionalData:new TextEncoder().encode('SportCenter sealed snapshot v1'),tagLength:128},key,bytes(publication.ciphertext));
 }
-function show(plain){
+class PublicationSizeError extends Error {}
+async function fetchEnvelope(path){
+  const response=await fetch(path+'?t='+Date.now(),{cache:'no-store',credentials:'omit',redirect:'error',referrerPolicy:'no-referrer'});
+  if(!response.ok)throw Error('Publicación no disponible');
+  const text=await response.text();
+  if(text.length>maxEnvelopeBytes)throw new PublicationSizeError('La publicación supera el tamaño que admite el visor.');
+  const data=JSON.parse(text);
+  if(data.version!==1||data.kdf!=='PBKDF2-SHA256'||data.iterations!==600000||bytes(data.salt).length!==32||bytes(data.iv).length!==12)throw Error('Formato no válido');
+  return data;
+}
+function configureHistory(manifest,key){
+  if(!manifest)return;
+  const anchor=document.querySelector('#fantasy-live-cuts').closest('.fantasy-cut-wrap');
+  const panel=document.createElement('details');
+  panel.className='fantasy-cut-wrap';
+  panel.innerHTML='<summary>Ver historial Fantasy</summary>';
+  const groups=new Map();
+  for(const item of manifest.archivos.filter(x=>x.visible)){
+    if(!groups.has(item.label))groups.set(item.label,[]);
+    groups.get(item.label).push(item);
+  }
+  for(const [label,parts] of groups){
+    const details=document.createElement('details');
+    const title=document.createElement('summary');
+    title.textContent=label;
+    const content=document.createElement('div');
+    details.append(title,content);
+    panel.append(details);
+    let loaded=false,loading=false;
+    details.addEventListener('toggle',async()=>{
+      if(!details.open||loaded||loading)return;
+      loading=true;
+      content.textContent='Cargando historial…';
+      try{
+        const fields={};
+        for(const part of parts){
+          if(!/^historial\/[a-z0-9-]+\.json$/.test(part.path))throw Error('Ruta no válida');
+          const sealed=await fetchEnvelope(part.path);
+          if(sealed.salt!==envelope.salt)throw Error('Acceso del archivo distinto');
+          const data=JSON.parse(new TextDecoder().decode(await decryptPublication(key,sealed)));
+          if(data.release!==manifest.release||data.id!==part.id)throw Error('Archivo de otro corte');
+          for(const [name,kind,entry] of data.entries){
+            if(!['fantasy_cortes','eventos_revisados_archivo'].includes(name)&&!/^posiciones_semana\d+_archivo$/.test(name))continue;
+            if(kind!=='list')continue;
+            (fields[name]??=[]).push(entry[1]);
+          }
+        }
+        window.renderSportCenterHistory(content,escapePayload(fields));
+        loaded=true;
+      }catch(error){
+        content.textContent=error instanceof PublicationSizeError?'Este archivo histórico supera el tamaño del visor.':'No se pudo abrir este historial. Cierra y vuelve a abrir para reintentar.';
+      }finally{loading=false}
+    });
+  }
+  if(groups.size)anchor.after(panel);
+}
+function show(plain,key){
   const data=JSON.parse(new TextDecoder().decode(plain));validate(data);
-  window.renderSportCenter(escapePayload(data));
+  const {historial_cifrado:history,...snapshot}=data;
+  window.renderSportCenter(escapePayload(snapshot));
+  configureHistory(history,key);
   document.querySelector('main').hidden=false;document.querySelector('nav.tabs').hidden=false;
   document.querySelector('#data-cut').textContent='Actualizado · '+data.meta.generado_label;
   document.querySelector('.live-dot').hidden=true;
@@ -83,7 +141,7 @@ unlock.addEventListener('click',async()=>{
       status.textContent='La contraseña no desbloqueó esta publicación. Comprueba la clave vigente.';
       return;
     }
-    try{show(plain)}
+    try{show(plain,key)}
     catch{renderFailure();return}
     if(remember.checked){
       try{
@@ -105,30 +163,20 @@ document.querySelector('#refresh-dashboard').addEventListener('click',()=>locati
 (async()=>{
   try{
     if(!crypto.subtle)throw Error('Se necesita HTTPS');
-    const response=await fetch('sealed.json?t='+Date.now(),{cache:'no-store',credentials:'omit',redirect:'error',referrerPolicy:'no-referrer'});
-    if(!response.ok)throw Error('Publicación no disponible');
-    const text=await response.text();
-    if(text.length>maxEnvelopeBytes){
-      openPanel.hidden=false;
-      inputPanel.hidden=true;
-      status.textContent='La publicación supera el tamaño que admite el visor. Avisa a soporte.';
-      return;
-    }
-    envelope=JSON.parse(text);
-    if(envelope.version!==1||envelope.kdf!=='PBKDF2-SHA256'||envelope.iterations!==600000||bytes(envelope.salt).length!==32||bytes(envelope.iv).length!==12)throw Error('Formato no válido');
+    envelope=await fetchEnvelope('sealed.json');
     unlock.disabled=false;
     try{
       const saved=await savedAccess('get');
       if(saved&&saved.salt===envelope.salt){
         const plain=await decryptPublication(saved.key);
-        try{show(plain)}catch{renderFailure()}
+        try{show(plain,saved.key)}catch{renderFailure()}
         return;
       }
     }catch{}
     openPanel.hidden=false;inputPanel.hidden=false;status.textContent='Abre tu dashboard una vez para recordar el acceso en este navegador.';
-  }catch{
+  }catch(error){
     openPanel.hidden=false;
     inputPanel.hidden=true;
-    status.textContent='No se pudo cargar la última publicación. Pulsa Actualizar para reintentar.';
+    status.textContent=error instanceof PublicationSizeError?error.message:'No se pudo cargar la última publicación. Pulsa Actualizar para reintentar.';
   }
 })();
