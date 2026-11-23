@@ -6,6 +6,7 @@ const unlock=document.querySelector('#unlock');
 const lock=document.querySelector('#lock');
 const inputPanel=document.querySelector('#login-controls');
 const openPanel=document.querySelector('#open-panel');
+const maxEnvelopeBytes=64*1024*1024;
 const bytes=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
 let envelope=null;
 const listKeys=['cupones','apuestas_largo_plazo','fantasy','alineaciones_propuestas','rivales_probables','waivers_propuestos','posiciones','cronologia','fantasy_cortes'];
@@ -50,8 +51,10 @@ async function derive(secret){
   const material=await crypto.subtle.importKey('raw',new TextEncoder().encode(secret),'PBKDF2',false,['deriveKey']);
   return crypto.subtle.deriveKey({name:'PBKDF2',salt:bytes(envelope.salt),iterations:600000,hash:'SHA-256'},material,{name:'AES-GCM',length:256},false,['decrypt']);
 }
-async function show(key){
-  const plain=await crypto.subtle.decrypt({name:'AES-GCM',iv:bytes(envelope.iv),additionalData:new TextEncoder().encode('SportCenter sealed snapshot v1'),tagLength:128},key,bytes(envelope.ciphertext));
+function decryptPublication(key){
+  return crypto.subtle.decrypt({name:'AES-GCM',iv:bytes(envelope.iv),additionalData:new TextEncoder().encode('SportCenter sealed snapshot v1'),tagLength:128},key,bytes(envelope.ciphertext));
+}
+function show(plain){
   const data=JSON.parse(new TextDecoder().decode(plain));validate(data);
   window.renderSportCenter(escapePayload(data));
   document.querySelector('main').hidden=false;document.querySelector('nav.tabs').hidden=false;
@@ -60,16 +63,37 @@ async function show(key){
   inputPanel.hidden=true;openPanel.hidden=true;lock.hidden=true;password.value='';
   status.textContent='Dashboard actualizado. Las próximas publicaciones aparecerán al abrir este enlace.';
 }
+function renderFailure(){
+  openPanel.hidden=false;
+  inputPanel.hidden=false;
+  status.textContent='El acceso se validó, pero el dashboard no pudo mostrar la publicación. Pulsa Actualizar o avisa a soporte.';
+}
 unlock.addEventListener('click',async()=>{
   if(!envelope)return;
-  unlock.disabled=true;status.textContent='Abriendo tu dashboard…';
+  unlock.disabled=true;
+  status.textContent='Abriendo tu dashboard…';
+  const entered=password.value;
+  password.value='';
   try{
-    const key=await derive(password.value);password.value='';await show(key);
-    if(remember.checked){
-      try{await savedAccess('put',{salt:envelope.salt,key});status.textContent='Acceso recordado en este navegador. Puedes abrir este enlace sin cargar archivos.'}
-      catch{status.textContent='Dashboard abierto. Este navegador no pudo recordar el acceso; pedirá la contraseña la próxima vez.'}
+    const key=await derive(entered);
+    let plain;
+    try{plain=await decryptPublication(key)}
+    catch(error){
+      if(error.name!=='OperationError')throw error;
+      status.textContent='La contraseña no desbloqueó esta publicación. Comprueba la clave vigente.';
+      return;
     }
-  }catch{password.value='';status.textContent='No se pudo abrir: comprueba la contraseña. Si persiste, pide revisar la publicación.'}
+    try{show(plain)}
+    catch{renderFailure();return}
+    if(remember.checked){
+      try{
+        await savedAccess('put',{salt:envelope.salt,key});
+        status.textContent='Acceso recordado en este navegador. Puedes abrir este enlace sin cargar archivos.';
+      }catch{
+        status.textContent='Dashboard abierto. Este navegador no pudo recordar el acceso; pedirá la contraseña la próxima vez.';
+      }
+    }
+  }catch{status.textContent='El navegador no pudo verificar el acceso. Pulsa Actualizar o avisa a soporte.'}
   finally{unlock.disabled=false}
 });
 password.addEventListener('keydown',e=>{if(e.key==='Enter')unlock.click()});
@@ -83,14 +107,28 @@ document.querySelector('#refresh-dashboard').addEventListener('click',()=>locati
     if(!crypto.subtle)throw Error('Se necesita HTTPS');
     const response=await fetch('sealed.json?t='+Date.now(),{cache:'no-store',credentials:'omit',redirect:'error',referrerPolicy:'no-referrer'});
     if(!response.ok)throw Error('Publicación no disponible');
-    const text=await response.text();if(text.length>32*1024*1024)throw Error('Archivo demasiado grande');
+    const text=await response.text();
+    if(text.length>maxEnvelopeBytes){
+      openPanel.hidden=false;
+      inputPanel.hidden=true;
+      status.textContent='La publicación supera el tamaño que admite el visor. Avisa a soporte.';
+      return;
+    }
     envelope=JSON.parse(text);
     if(envelope.version!==1||envelope.kdf!=='PBKDF2-SHA256'||envelope.iterations!==600000||bytes(envelope.salt).length!==32||bytes(envelope.iv).length!==12)throw Error('Formato no válido');
     unlock.disabled=false;
     try{
       const saved=await savedAccess('get');
-      if(saved&&saved.salt===envelope.salt){await show(saved.key);return}
+      if(saved&&saved.salt===envelope.salt){
+        const plain=await decryptPublication(saved.key);
+        try{show(plain)}catch{renderFailure()}
+        return;
+      }
     }catch{}
     openPanel.hidden=false;inputPanel.hidden=false;status.textContent='Abre tu dashboard una vez para recordar el acceso en este navegador.';
-  }catch{openPanel.hidden=false;status.textContent='No se pudo cargar la última publicación. Pulsa Actualizar para reintentar.'}
+  }catch{
+    openPanel.hidden=false;
+    inputPanel.hidden=true;
+    status.textContent='No se pudo cargar la última publicación. Pulsa Actualizar para reintentar.';
+  }
 })();
