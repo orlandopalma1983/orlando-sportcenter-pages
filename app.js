@@ -247,17 +247,17 @@ if(D.meta.version_datos==='20261027-dal-phi-final'){document.querySelector('#tab
 
 if(D.meta.semana_resultados_final){document.querySelector('#tablas h2').textContent=`Tablas finales · Semana ${resultsWeek}`;document.querySelector('#tablas .notice').textContent='Semana '+resultsWeek+' terminada: todos los partidos revisados y cero titulares pendientes. Historial oficial DataForce y TE Premium verificado; los VP se calculan según el reglamento. Las alineaciones de la semana siguiente se muestran por separado.';}
 
-if(!D.meta.semana_resultados_final&&D.posiciones_semana9_archivo&&D.duelos_semana10){document.querySelector("#tablas h2").textContent=D.corte_partido?.semana===10&&D.corte_partido.corte!=="PREVIA"?"Tablas · Semana 10 al corte revisado · Semana 9 cerrada":"Tablas · Semana 9 cerrada e inicio de Semana 10";}
+if(resultsWeek===10&&!D.meta.semana_resultados_final&&D.posiciones_semana9_archivo&&D.duelos_semana10){document.querySelector("#tablas h2").textContent=D.corte_partido?.semana===10&&D.corte_partido.corte!=="PREVIA"?"Tablas · Semana 10 al corte revisado · Semana 9 cerrada":"Tablas · Semana 9 cerrada e inicio de Semana 10";}
 
 
 // Active S11 previews and historical S10 closure are intentionally separate.
 if(D.rosters_actuales_semana11){
  document.querySelector('#fantasy h2').textContent='Semana 11 · tus alineaciones y rivales';
  document.querySelector('#lineup-comparisons').insertAdjacentHTML('beforebegin','<p class="notice">Proyecciones estimadas: ESPN ajustado a reglas de cada liga. Fuente ESPN S11 adaptada al scoring. Sin proyección verificada: pendiente. La proyección no confirma el alta médica. BYE vale 0 porque no tiene partido.</p>');
- document.querySelector('#fantasy-list').insertAdjacentHTML('beforebegin','<h3>Resultados finales · Semana 10</h3>');
- document.querySelector('#fantasy-live-cuts').closest('.fantasy-cut-wrap').querySelector('button').textContent='👁 Ver partidos y estadísticas cerradas de S10';
- document.querySelector('#fantasy-live-cuts').closest('.fantasy-cut-wrap').querySelector('button').dataset.show='👁 Ver partidos y estadísticas cerradas de S10';
- document.querySelector('#lineup-comparisons').insertAdjacentHTML('afterend',`<details id="s11-all-duels"><summary>Los 24 duelos oficiales · Semana 11</summary>${D.duelos_semana11.map(t=>`<article><h3>${esc(t.codigo)}</h3><ul>${t.partidos.map(p=>`<li>${esc(p.equipo_a)} vs. ${esc(p.equipo_b)}</li>`).join('')}</ul></article>`).join('')}</details>`);
+ document.querySelector('#fantasy-list').insertAdjacentHTML('beforebegin',`<h3>Resultados Fantasy · Semana ${resultsWeek}${D.meta.semana_resultados_final?' cerrada':' al corte revisado'}</h3>`);
+ document.querySelector('#fantasy-live-cuts').closest('.fantasy-cut-wrap').querySelector('button').textContent='👁 Ver partidos y cortes revisados';
+ document.querySelector('#fantasy-live-cuts').closest('.fantasy-cut-wrap').querySelector('button').dataset.show='👁 Ver partidos y cortes revisados';
+ document.querySelector('#lineup-comparisons').insertAdjacentHTML('afterend',`<details id="s11-all-duels"><summary>Los 24 duelos oficiales · Semana 11</summary>${D.duelos_semana11.map(t=>`<article><h3>${esc(t.codigo)}</h3><ul>${t.partidos.map(p=>`<li>${esc(p.equipo_a)} vs. ${esc(p.equipo_b)} · ${num(p.puntos_a)}–${num(p.puntos_b)}</li>`).join('')}</ul></article>`).join('')}</details>`);
 }
 if(D.probabilidades_clasificacion){
  const P=D.probabilidades_clasificacion;
